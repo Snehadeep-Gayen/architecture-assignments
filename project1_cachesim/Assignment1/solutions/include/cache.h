@@ -1,0 +1,7 @@
+namespace Cache
+{
+    class Cache
+    {
+
+    };
+}
