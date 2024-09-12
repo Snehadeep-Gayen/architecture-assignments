@@ -1,5 +1,6 @@
 #include <assert.h>
 #include <cstring>
+#include <iostream>
 
 ///////////////////////////////////////////////////////////////////////////
 // If return value is >0, CACTI failed on this cache configuration.

@@ -1,7 +1,0 @@
-namespace Cache
-{
-    class Cache
-    {
-
-    };
-}
