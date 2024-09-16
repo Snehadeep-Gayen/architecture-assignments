@@ -23,7 +23,7 @@ namespace Cache{
 
         // insert the new set
         tags.insert({operationMap[tag], tag});
-        dirty[tag] = !read;
+        dirty[tag] = dirty[tag] || !read;
 
         return MemStatus::HIT;
     }
@@ -41,7 +41,7 @@ namespace Cache{
 
         // insert the new set
         tags.insert({operationMap[tag], tag});
-        dirty[tag] = !read;
+        dirty[tag] = dirty[tag] || !read;
 
         return AllocStatus::SUCCESS;
     }
@@ -62,6 +62,7 @@ namespace Cache{
         assert(operationMap.find(tag)!=operationMap.end());
         tags.erase(tags.find({operationMap[tag], tag}));
         operationMap.erase(tag);
+
         dirty.erase(tag);
         // TODO: Handle dirty blocks here
     }
