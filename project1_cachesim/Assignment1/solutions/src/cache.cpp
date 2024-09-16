@@ -1,4 +1,5 @@
 #include "cache.hpp"
+#include <iostream>
 
 namespace Cache{
 
@@ -8,7 +9,7 @@ namespace Cache{
         : numBlks(numBlks), operationCount(0), currentSize(0)
         {}
 
-    MemStatus FullyAssociativeCache::Access(int tag)
+    MemStatus FullyAssociativeCache::Access(int tag, bool read)
     {
         if(operationMap.find(tag)==operationMap.end())
             return MemStatus::MISS;
@@ -22,11 +23,12 @@ namespace Cache{
 
         // insert the new set
         tags.insert({operationMap[tag], tag});
+        dirty[tag] = !read;
 
         return MemStatus::HIT;
     }
 
-    AllocStatus FullyAssociativeCache::Allocate(int tag)
+    AllocStatus FullyAssociativeCache::Allocate(int tag, bool read)
     {
         assert(operationMap.find(tag)==operationMap.end());
 
@@ -39,6 +41,7 @@ namespace Cache{
 
         // insert the new set
         tags.insert({operationMap[tag], tag});
+        dirty[tag] = !read;
 
         return AllocStatus::SUCCESS;
     }
@@ -48,6 +51,9 @@ namespace Cache{
         assert(tags.size()==numBlks);
         int retTag = (*tags.begin()).second;
         tags.erase(tags.begin());
+        operationMap.erase(retTag);
+        dirty.erase(retTag);
+        // TODO: Handle Dirty blocks here
         return retTag;
     }
 
@@ -55,6 +61,9 @@ namespace Cache{
     {
         assert(operationMap.find(tag)!=operationMap.end());
         tags.erase(tags.find({operationMap[tag], tag}));
+        operationMap.erase(tag);
+        dirty.erase(tag);
+        // TODO: Handle dirty blocks here
     }
 
     bool FullyAssociativeCache::IsFull(void)
@@ -62,12 +71,20 @@ namespace Cache{
         return tags.size()>=numBlks;
     }
 
+    void FullyAssociativeCache::Print(void)
+    {
+        for(auto [counter, tag] : tags)
+        {
+            std::cout << std::hex << tag << " " << (dirty[tag]?"D":" ") << "\t";
+        }
+        std::cout << std::dec << "\n";
+    }
+
     ///////////////////////////////////////////////////////////////////
 
 
 
     //////////////////// Definitions for Cache ////////////////////////
-
 
     Cache::Cache(int cacheSize, int blkSize, int assoc, bool vcEnable, int vcBlks)
         : cacheSize(cacheSize), blkSize(blkSize), assoc(assoc), vcEnable(vcEnable), vcBlks(vcBlks), 
@@ -88,17 +105,31 @@ namespace Cache{
         return Write(tag, index);
     }
 
-    void Cache::Allocate(int address)
+    void Cache::Allocate(int address, bool read)
     {
         auto [tag, index] = Partition(address);
-        // Allocation logic here (not expanded)
+        std::cout << "Allocating " << tag << " " << index << "\n";
+        if(sets[index].IsFull())
+            sets[index].Evict();
+        assert(sets[index].Allocate(tag, read)==AllocStatus::SUCCESS);
+    }
+
+    void Cache::Print(void)
+    {
+        for(int i=0; i<sets.size(); i++)
+        {
+            std::cout << " set " << i << ":\t";
+            sets[i].Print();
+        }
     }
 
     std::pair<int, int> Cache::Partition(unsigned int address)
     {
         int tagAndIndex = (address / (unsigned int) blkSize);
-        int index = tagAndIndex % assoc;
-        int tag = tagAndIndex / assoc;
+        int index = tagAndIndex % (sets.size());
+        int tag = tagAndIndex / (sets.size());
+
+        std::cout << "Address: " << address << ", tag: " << tag << ", index" << index << "\n";
         return std::make_pair(tag, index);
     }
 
@@ -113,17 +144,17 @@ namespace Cache{
             stats.readMiss++;
             return MemStatus::MISS;
         }
-        
+
         if(vcEnable)
         {
             stats.swapReqs++;
-            if(vc.Access(tag)==MemStatus::HIT)
+            if(vc.Access(tag)==MemStatus::HIT)  // This access will change the LRU status of the VC, what to do now
             {
                 stats.swaps++;
                 // now I need to remove a particular element from the cache
                 vc.Evict(tag);
                 int victimBlk = sets[index].Evict();
-                sets[index].Allocate(tag);
+                sets[index].Allocate(tag); // handle dirty blocks here in a better way
                 vc.Allocate(victimBlk);
                 return MemStatus::HIT;
             }
@@ -136,11 +167,10 @@ namespace Cache{
     // Write is same as read, because there is no Allocation
     MemStatus Cache::Write(int tag, int index)
     {
-
         stats.writes++;
-        if(sets[index].Access(tag)==MemStatus::HIT)
+        if(sets[index].Access(tag, false)==MemStatus::HIT)
             return MemStatus::HIT;
-
+        
         if(!sets[index].IsFull())
         {
             stats.writeMiss++;
@@ -156,7 +186,7 @@ namespace Cache{
                 // now I need to remove a particular element from the cache
                 vc.Evict(tag);
                 int victimBlk = sets[index].Evict();
-                sets[index].Allocate(tag);
+                sets[index].Allocate(tag, false);
                 vc.Allocate(victimBlk);
                 return MemStatus::HIT;
             }

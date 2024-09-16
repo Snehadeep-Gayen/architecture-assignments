@@ -21,8 +21,8 @@ namespace Cache
 
         FullyAssociativeCache(int numBlks);
 
-        MemStatus Access(int tag);
-        AllocStatus Allocate(int tag);
+        MemStatus Access(int tag, bool read=true);
+        AllocStatus Allocate(int tag, bool read=true);
         int Evict(void);
 
         // used to specifically evict the block with tag
@@ -30,6 +30,8 @@ namespace Cache
         void Evict(int tag);
 
         bool IsFull(void);
+
+        void Print(void);
 
     private:
         // configuration
@@ -40,8 +42,9 @@ namespace Cache
         int64_t operationCount;
 
         // memory
-        std::set<std::pair<int64_t,int>, std::greater<std::pair<int64_t, int>>()> tags;
+        std::set<std::pair<int64_t,int>, std::greater<std::pair<int64_t, int>>> tags;
         std::unordered_map<int,int64_t> operationMap;
+        std::unordered_map<int, bool> dirty;
     };
 
     class Cache
@@ -68,7 +71,11 @@ namespace Cache
         // Note that no Allocation is done on MISS
         MemStatus Write(unsigned int address);
 
-        void Allocate(int address);
+        void Allocate(int address, bool read=true);
+
+        struct Stats GetStats(void) { return stats; };
+
+        void Print(void);
 
     private:
 

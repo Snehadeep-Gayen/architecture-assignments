@@ -5,7 +5,7 @@ project(cachesim)
 # export the compile commands for clangd to pick it up
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
-set(CMAKE_CXX_STANDARD 20)
+set(CMAKE_CXX_STANDARD 23)
 
 # Include directories
 include_directories(include)
