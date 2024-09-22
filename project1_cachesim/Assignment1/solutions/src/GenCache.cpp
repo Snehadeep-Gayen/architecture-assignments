@@ -6,17 +6,15 @@
 
 namespace Cache
 {
-    Cache::Cache(int cacheSize, int blkSize, int assoc, bool vcEnable, int vcBlks)
+    GenCache::GenCache(int cacheSize, int blkSize, int assoc)
         : cacheSize(cacheSize), 
         blkSize(blkSize), 
         assoc(assoc), 
-        vcEnable(vcEnable), 
-        vcBlks(vcBlks), 
         sets(cacheSize / (blkSize * assoc), {assoc})
     {
     }
 
-    std::pair<int,int> Cache::Partition(Addr address)
+    std::pair<int,int> GenCache::Partition(Addr address)
     {
         int tagAndIndex = (address / (unsigned int) blkSize);
         int index  = tagAndIndex % (sets.size());
@@ -24,25 +22,25 @@ namespace Cache
         return std::make_pair(tag, index);
     }
 
-    bool Cache::IsPresent(Addr address)
+    bool GenCache::IsPresent(Addr address)
     {
         auto [tag, index] = Partition(address);
         return sets[index].IsPresent(tag);
     }
 
-    void Cache::UpdateLRU(Addr address)
+    void GenCache::UpdateLRU(Addr address)
     {
         auto [tag, index] = Partition(address);
         sets[index].UpdateLRU(tag);
     }
 
-    bool Cache::IsThereSpace(Addr address)
+    bool GenCache::IsThereSpace(Addr address)
     {
         auto [tag, index] = Partition(address);
         return sets[index].IsFull();
     }
 
-    Block Cache::MakeSpace(Addr address)
+    Block GenCache::MakeSpace(Addr address)
     {
         assert(!IsThereSpace(address));
 
@@ -51,7 +49,7 @@ namespace Cache
         return set.Remove(set.GetLRU());
     }
 
-    void Cache::Add(Addr address)
+    void GenCache::Add(Addr address)
     {
         assert(!IsPresent(address));
 
@@ -59,7 +57,7 @@ namespace Cache
         sets[index].Add(tag, {.addr = address});
     }
 
-    void Cache::MarkDirty(Addr address)
+    void GenCache::MarkDirty(Addr address)
     {
         assert(IsPresent(address));
 
@@ -67,7 +65,7 @@ namespace Cache
         sets[index].MarkDirty(tag);
     }
 
-    void Cache::MarkClean(Addr address)
+    void GenCache::MarkClean(Addr address)
     {
         assert(IsPresent(address));
 
@@ -75,7 +73,7 @@ namespace Cache
         sets[index].MarkClean(tag);
     }
 
-    Block Cache::Remove(Addr address)
+    Block GenCache::Remove(Addr address)
     {
         assert(IsPresent(address));
 
@@ -83,7 +81,7 @@ namespace Cache
         return sets[index].Remove(tag);
     }
 
-    void Cache::Print(void)
+    void GenCache::Print(void)
     {
         std::cout << "TODO: To write print function";
     }

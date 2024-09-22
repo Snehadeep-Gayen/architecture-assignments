@@ -1,3 +1,5 @@
+#pragma once
+
 #include <cstdint>
 #include <list>
 #include <set>
@@ -32,6 +34,7 @@ namespace Cache
         struct metadata_t
         {
             Addr addr;
+            bool dirty;
         };
 
         FullyAssociativeCache(int numBlks);

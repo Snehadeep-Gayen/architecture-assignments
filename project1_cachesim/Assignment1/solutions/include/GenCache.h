@@ -1,13 +1,15 @@
+#pragma once 
+
 #include "FullAssocCache.h"
 
 namespace Cache{
 
 
-class Cache 
+class GenCache 
 {
     public:
 
-        Cache(int cacheSize, int blkSize, int assoc, bool vcEnable, int vcBlks);
+        GenCache(int cacheSize, int blkSize, int assoc);
 
         bool IsPresent(Addr address); // does not update the state of the cache, just tells if the block is there in the cache or not
 
@@ -27,16 +29,16 @@ class Cache
 
         void Print(void);
 
-    private:
-
+        // ideally this function should be private, but because of my bad design choice, currently im sticking to this
+        // need to change it later to something that is more clear
         std::pair<int, int> Partition(Addr address);
+
+    private:
 
         // default variables
         int64_t  cacheSize;
         int blkSize;
         int assoc;
-        int vcBlks;
-        bool vcEnable;
 
         std::vector<FullyAssociativeCache> sets;
 };

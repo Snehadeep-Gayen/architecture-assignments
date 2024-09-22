@@ -94,7 +94,7 @@ namespace Cache{
             {
                 // better to use a constructor here
                 e.valid = true;
-                e.dirty = false;
+                e.dirty = meta.dirty;
                 e.lastAccessed = operationCount++;
                 e.meta = meta;
                 e.tag = tag;

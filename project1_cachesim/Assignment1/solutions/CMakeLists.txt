@@ -15,6 +15,8 @@ set(SOURCES
     src/GenCache.cpp
     src/FullAssocCache.cpp
     src/Main.cpp
+    src/Simulator.cpp
+    src/Cache.cpp
 )
 
 # Add executable
