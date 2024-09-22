@@ -1,5 +1,5 @@
 #include <cassert>
-#include "simulator.h"
+#include "Simulator.h"
 
 int main(int argc, char* argv[])
 {

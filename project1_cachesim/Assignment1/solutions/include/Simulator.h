@@ -1,15 +1,17 @@
+#include <cassert>
+#include <optional>
 #include <string>
 #include <utility>
 #include <fstream>
 #include <vector>
 #include <iostream>
-#include "cache.hpp"
+#include "GenCache.h"
 
 namespace Simulator
 {
     struct L1Config
     {
-        int sz;
+        int64_t sz;
         int assoc;
         int blksz;
         int vc_num_blk;
@@ -17,7 +19,7 @@ namespace Simulator
 
     struct L2Config
     {
-        int sz;
+        int64_t sz;
         int assoc;
     };
 
@@ -29,27 +31,34 @@ namespace Simulator
     };
 
 
-
-    // Function to print the Stats struct
-    void printStats(const Cache::Cache::Stats& stats) {
-        std::cout << "Stats Information:" << std::endl;
-        std::cout << "Reads:       " << stats.reads << std::endl;
-        std::cout << "Read Misses: " << stats.readMiss << std::endl;
-        std::cout << "Writes:      " << stats.writes << std::endl;
-        std::cout << "Write Misses:" << stats.writeMiss << std::endl;
-        std::cout << "Swap Reqs:   " << stats.swapReqs << std::endl;
-        std::cout << "Swaps:       " << stats.swaps << std::endl;
-    }
+    void PrintStats(const Simulator::Stats& stats);
 
     class Simulator
     {
         public:
 
-        struct Trace
+        struct Stats
         {
+            int reads;
+            int readMiss;
+            int writes;
+            int writeMiss;
+            int swapReqs;
+            int swaps;
+        } stats;
+
+        class Trace
+        {
+        public:
             bool read;
             int64_t mem;
         };
+
+        struct Config conf;
+        Cache::Cache l1;
+        std::optional<Cache::Cache> l2;
+        std::vector<Trace> traces;
+
             // Function to print Trace struct
         void printTrace(const Trace& trace) const {
             std::cout << "Trace - Read: " << (trace.read ? "True" : "False")
@@ -68,11 +77,9 @@ namespace Simulator
             std::cout << " trace_file:\t" << conf.traceFilename << "\n\n";
         }
 
-        Simulator(Config conf) : conf(conf) 
+        Simulator(struct Config conf) : conf(conf), traces(), 
+            l1(conf.l1.sz, conf.l1.blksz, conf.l1.assoc, conf.l1.vc_num_blk!=0, conf.l1.vc_num_blk)
         {
-            // ready the L1 cache
-            l1.emplace(conf.l1.sz, conf.l1.blksz, conf.l1.assoc, conf.l1.vc_num_blk!=0, conf.l1.vc_num_blk);
-
             // ready the l2 cache if sz is not 0
             if(conf.l2.sz != 0)
                 l2.emplace(conf.l2.sz, conf.l1.blksz, conf.l2.assoc, false, 0);
@@ -95,54 +102,53 @@ namespace Simulator
             }
 
             PrintConfig();
-        };
+        }
 
         void Start(void) 
         {
             for(auto trace : traces)
             {
                 printTrace(trace);
+
                 if(trace.read)
+                    
+
+                if(l1.IsPresent(trace.mem))
                 {
-                    auto status1 = l1.value().Read(trace.mem);
-                    if(status1 == Cache::MemStatus::MISS)
-                    {
-                        l1.value().Allocate(trace.mem);
-                        // try in L2 cache
-                        if(l2.has_value() && l2.value().Read(trace.mem)==Cache::MemStatus::MISS)
-                        {
-                            l2.value().Allocate(trace.mem);
-                        }
-                    }
+                    l1.UpdateLRU(trace.mem);
+                    if(!trace.read)
+                        l1.MarkDirty(trace.mem);
                 }
-                else
+                else if(l2.has_value() && l2->IsPresent(trace.mem))
                 {
-                    auto status1 = l1.value().Write(trace.mem);
-                    if(status1 == Cache::MemStatus::MISS)
-                    {
-                        l1.value().Allocate(trace.mem, false);
-                        // try in L2 cache
-                        if(l2.has_value() && l2.value().Write(trace.mem)==Cache::MemStatus::MISS)
-                        {
-                            l2.value().Allocate(trace.mem, false);
-                        }
-                    }
+                    l2->UpdateLRU(trace.mem);
+                    if(!trace.read)
+                        l2->MarkDirty(trace.mem);
                 }
             }
 
             std::cout << "===== L1 contents =====\n";
-            l1.value().Print();
+            l1.Print();
             std::cout << "\n";
 
-            auto stats1 = l1.value().GetStats();
-            printStats(stats1);
-        };
+            PrintStats(stats);
+        }
 
-        private:
-
-        Config conf;
-        std::optional<Cache::Cache> l1, l2;
-        std::vector<struct Trace> traces;
     };
+
+
+
+
+    // Function to print the Stats struct
+    void PrintStats(const Simulator::Simulator::Stats& stats) 
+    {
+        std::cout << "Stats Information:" << std::endl;
+        std::cout << "Reads:       " << stats.reads << std::endl;
+        std::cout << "Read Misses: " << stats.readMiss << std::endl;
+        std::cout << "Writes:      " << stats.writes << std::endl;
+        std::cout << "Write Misses:" << stats.writeMiss << std::endl;
+        std::cout << "Swap Reqs:   " << stats.swapReqs << std::endl;
+        std::cout << "Swaps:       " << stats.swaps << std::endl;
+    }
     
 }

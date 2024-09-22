@@ -12,8 +12,9 @@ include_directories(include)
 
 # Source files
 set(SOURCES
-    src/cache.cpp
-    src/main.cpp
+    src/GenCache.cpp
+    src/FullAssocCache.cpp
+    src/Main.cpp
 )
 
 # Add executable
