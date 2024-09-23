@@ -2,9 +2,35 @@
 #include <algorithm>
 #include <cassert>
 #include <stdexcept>
+#include <iostream>
 
 
 namespace Cache{
+
+    void FullyAssociativeCache::Print(void)
+    {
+        auto& copy = tags;
+
+        sort(copy.begin(), copy.end(), ([](const Entry& e1, const Entry& e2){
+            if(e1.valid && !e2.valid)
+                return true;
+            
+            if(e1.valid && e2.valid && e1.lastAccessed > e2.lastAccessed)
+                return true;
+
+            return false;
+        }));
+
+        for(const auto& e : copy)
+        {
+            if(e.valid)
+            {
+                std::cout << std::hex << e.tag << std::dec << "\t";
+                char dirty = e.dirty? 'D' : ' ';
+                std::cout << dirty << "\t";
+            }
+        }
+    }
 
     FullyAssociativeCache::FullyAssociativeCache(int numBlks) : tags(numBlks)
     {
@@ -12,10 +38,10 @@ namespace Cache{
 
     bool FullyAssociativeCache::IsFull()
     {
-        return std::any_of(tags.begin(), tags.end(), 
+        return std::all_of(tags.begin(), tags.end(), 
             [](const Entry& e) 
             { 
-                return !e.valid; 
+                return e.valid; 
             });
     }
 
@@ -30,11 +56,16 @@ namespace Cache{
 
     int FullyAssociativeCache::GetLRU(void)
     {
-        int lastAccessed = -1;
+        assert(IsFull());
+        int lastAccessed = INT_MAX;
         int tag = -1;
         for(const auto& e : tags)
-            if(e.valid && e.lastAccessed > lastAccessed)
+            if(e.valid && e.lastAccessed < lastAccessed)
+            {
                 tag = e.tag;
+                lastAccessed = e.lastAccessed;
+            }
+        assert(tag != -1); // atleast one block should be there
         return tag;
     }
 
@@ -98,6 +129,7 @@ namespace Cache{
                 e.lastAccessed = operationCount++;
                 e.meta = meta;
                 e.tag = tag;
+                break;
             }
         }
     }

@@ -37,7 +37,7 @@ namespace Cache
     bool GenCache::IsThereSpace(Addr address)
     {
         auto [tag, index] = Partition(address);
-        return sets[index].IsFull();
+        return !sets[index].IsFull();
     }
 
     Block GenCache::MakeSpace(Addr address)
@@ -83,6 +83,11 @@ namespace Cache
 
     void GenCache::Print(void)
     {
-        std::cout << "TODO: To write print function";
+        for(int i=0; i<sets.size(); i++)
+        {
+            std::cout << "set " << i << ": ";
+            sets[i].Print();
+            std::cout << "\n";
+        }
     }
 }

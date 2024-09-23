@@ -56,6 +56,8 @@ namespace Cache
 
         bool IsFull(void);
 
+        void Print(void);
+
     private:
 
         class Entry

@@ -37,6 +37,8 @@ namespace Cache{
 
         void PrintStats(int type=0);
 
+        Stats GetStats(void) { return stats; };
+
     private:
 
         std::pair<int, int> Partition(Addr address);

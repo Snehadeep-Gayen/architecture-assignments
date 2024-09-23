@@ -6,7 +6,7 @@ namespace Cache{
 
     void Cache::Print(void)
     {
-
+        cache.Print();
     }
 
     void Cache::PrintStats(int type)
