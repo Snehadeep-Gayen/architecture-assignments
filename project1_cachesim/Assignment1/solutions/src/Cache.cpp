@@ -9,6 +9,15 @@ namespace Cache{
         cache.Print();
     }
 
+    void Cache::PrintVC(void)
+    {
+        if(vc.has_value())
+        {
+            std::cout << "set 0:\t";
+            vc->Print();
+        }
+    }
+
     void Cache::PrintStats(int type)
     {
         std::cout << "Stats Information:" << std::endl;
@@ -29,9 +38,9 @@ namespace Cache{
         }
 
     
-    std::pair<int,int> Cache::Partition(Addr address)
+    unsigned int Cache::Partition(Addr address)
     {
-        return cache.Partition(address);
+        return (address / (unsigned int) blkSize); // tag and index
     }
 
     Cache::OperationStatus Cache::Read(Addr address)
@@ -54,7 +63,7 @@ namespace Cache{
         }
         else 
         {
-
+            stats.readMiss++;
             // have to make space in the cache
             Block victimBlk = cache.MakeSpace(address);
             cache.Add(address);
@@ -66,26 +75,23 @@ namespace Cache{
                 ret.hit = false;
                 ret.dirtyEvicted = victimBlk.dirty;
                 ret.address = victimBlk.address;
-
-                stats.readMiss++;
                 return ret;
             }
 
             stats.swapReqs++;
 
             // check if there is block in the victim cache
-            auto [oldTag, oldIndex] = Partition(address);
-
+            auto tagAndIndex = Partition(address);
 
             Cache::OperationStatus ret;
             ret.hit = false;
             ret.dirtyEvicted = false;
 
-            if(vc->IsPresent(oldTag))
+            if(vc->IsPresent(tagAndIndex))
             {
                 ret.hit = true; // victim cache hit is same as L1 hit
                 stats.swaps++;
-                Block blk = vc->Remove(oldTag);
+                Block blk = vc->Remove(tagAndIndex);
                 if(blk.dirty)
                     cache.MarkDirty(address);
             }
@@ -101,7 +107,7 @@ namespace Cache{
             }
 
             // add the evicted block to victim cache
-            vc->Add(Partition(victimBlk.address).first, 
+            vc->Add(Partition(victimBlk.address), 
                 {.addr = victimBlk.address,
                     .dirty = victimBlk.dirty });
 
@@ -132,6 +138,7 @@ namespace Cache{
         }
         else 
         {
+            stats.writeMiss++;
             // have to make space in the cache
             Block victimBlk = cache.MakeSpace(address);
             cache.Add(address);
@@ -144,26 +151,23 @@ namespace Cache{
                 ret.hit = false;
                 ret.dirtyEvicted = victimBlk.dirty;
                 ret.address = victimBlk.address;
-
-                stats.writeMiss++;
                 return ret;
             }
 
             stats.swapReqs++;
 
             // check if there is block in the victim cache
-            auto [oldTag, oldIndex] = Partition(address);
-
+            auto tagAndIndex = Partition(address);
 
             Cache::OperationStatus ret;
             ret.hit = false;
             ret.dirtyEvicted = false;
 
-            if(vc->IsPresent(oldTag))
+            if(vc->IsPresent(tagAndIndex))
             {
                 ret.hit = true; // victim cache hit is same as L1 hit
                 stats.swaps++;
-                Block blk = vc->Remove(oldTag);
+                Block blk = vc->Remove(tagAndIndex);
                 if(blk.dirty)   // Not needed, but still keeping it for clarity
                     cache.MarkDirty(address);
             }
@@ -179,7 +183,7 @@ namespace Cache{
             }
 
             // add the evicted block to victim cache
-            vc->Add(Partition(victimBlk.address).first, 
+            vc->Add(Partition(victimBlk.address), // victim cache stores block address (Tag+index) not the tag. 
                 {.addr = victimBlk.address,
                 .dirty = victimBlk.dirty});
 

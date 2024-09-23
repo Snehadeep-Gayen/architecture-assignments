@@ -35,13 +35,15 @@ namespace Cache{
 
         void Print(void);
 
+        void PrintVC(void);
+
         void PrintStats(int type=0);
 
         Stats GetStats(void) { return stats; };
 
     private:
 
-        std::pair<int, int> Partition(Addr address);
+        unsigned int Partition(Addr address);
 
         GenCache cache;
         std::optional<FullyAssociativeCache> vc;

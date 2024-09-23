@@ -118,6 +118,7 @@ namespace Cache{
     void FullyAssociativeCache::Add(int tag, metadata_t meta)
     {
         assert(!IsPresent(tag));
+        assert(!IsFull());
 
         for(auto& e : tags)
         {
