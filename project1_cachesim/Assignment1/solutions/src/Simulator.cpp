@@ -78,7 +78,6 @@ namespace Simulator
                 continue;
             }
 
-
             // ASK which happens first
 
             if(!L1status.hit)
@@ -92,12 +91,10 @@ namespace Simulator
             if(L1status.dirtyEvicted)
             {
                 writeback_from_L1_plus_VC++;
-                Cache::Cache::OperationStatus L2Wstatus = l2->Write(trace.mem);
+                Cache::Cache::OperationStatus L2Wstatus = l2->Write(L1status.address);
                 if(L2Wstatus.dirtyEvicted)
                     writeback_from_L2++;
             }
-
-
         }
 
         std::cout << "===== L1 contents =====\n";
@@ -120,7 +117,7 @@ namespace Simulator
 
         Cache::Cache::Stats l1stats = l1.GetStats();
 
-        std::cout << "\n";
+        std::cout << "\n===== Simulation results (raw) =====\n";
         
         std::cout << "a. number of L1 reads:\t\t\t" << l1stats.reads << std::endl;
         std::cout << "b. number of L1 read misses:\t\t\t" << l1stats.readMiss << std::endl;
@@ -146,7 +143,7 @@ namespace Simulator
         std::cout << "m. number of L2 write misses:\t\t\t" << l2stats.writeMiss << std::endl;
         if(l2.has_value())
         {
-            std::cout << "n. L2 miss rate:\t\t\t" << std::fixed << std::setprecision(4) << (l2stats.readMiss + l2stats.writeMiss) * 1.0f / (l2stats.reads + l2stats.writes) << std::endl;
+            std::cout << "n. L2 miss rate:\t\t\t" << std::fixed << std::setprecision(4) << (l2stats.readMiss) * 1.0f / (l2stats.reads) << std::endl;
         }
         else
         {
@@ -161,9 +158,6 @@ namespace Simulator
         {
             std::cout << "p. total memory traffic:\t\t\t" << (l1stats.readMiss + l1stats.writeMiss - l1stats.swaps + writeback_from_L1_plus_VC) << std::endl;
         }
-        
-
-
     }
 
     // Function to print the Trace struct
