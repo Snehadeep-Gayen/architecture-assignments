@@ -127,7 +127,7 @@ namespace Simulator
         std::cout << "c. number of L1 writes:\t\t\t" << l1stats.writes << std::endl;
         std::cout << "d. number of L1 write misses:\t\t\t" << l1stats.writeMiss << std::endl;
         std::cout << "e. number of swap requests:\t\t\t" << l1stats.swapReqs << std::endl;
-        std::cout << "f. swap request rate:\t\t\t" << l1stats.swapReqs * 1.0f / (l1stats.reads + l1stats.writes) << std::endl;
+        std::cout << "f. swap request rate:\t\t\t" << std::fixed << std::setprecision(4) << l1stats.swapReqs * 1.0f / (l1stats.reads + l1stats.writes) << std::endl;
         std::cout << "g. number of swaps:\t\t\t" << l1stats.swaps << "\n";
         std::cout << "h. combined L1+VC miss rate:\t\t\t" << (l1stats.readMiss + l1stats.writeMiss - l1stats.swaps) * 1.0f / (l1stats.reads + l1stats.writes) << std::endl;
         std::cout << "i. number writebacks from L1/VC:\t\t\t" << writeback_from_L1_plus_VC << std::endl;
@@ -146,11 +146,11 @@ namespace Simulator
         std::cout << "m. number of L2 write misses:\t\t\t" << l2stats.writeMiss << std::endl;
         if(l2.has_value())
         {
-            std::cout << "n. L2 miss rate:\t\t\t" << (l2stats.readMiss + l2stats.writeMiss) * 1.0f / (l2stats.reads + l2stats.writes) << std::endl;
+            std::cout << "n. L2 miss rate:\t\t\t" << std::fixed << std::setprecision(4) << (l2stats.readMiss + l2stats.writeMiss) * 1.0f / (l2stats.reads + l2stats.writes) << std::endl;
         }
         else
         {
-            std::cout << "n. L2 miss rate:\t\t\t" << 0 << std::endl;
+            std::cout << "n. L2 miss rate:\t\t\t" << std::fixed << std::setprecision(4) << 0 << std::endl;
         }
         std::cout << "o. number of writebacks from L2 to memory:\t" << writeback_from_L2 << std::endl;
         if(l2.has_value())
