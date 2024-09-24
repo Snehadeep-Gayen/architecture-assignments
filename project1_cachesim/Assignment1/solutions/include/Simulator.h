@@ -7,6 +7,7 @@
 #include <fstream>
 #include <vector>
 #include <iostream>
+#include <memory>
 #include "Cache.h"
 
 namespace Simulator
@@ -30,6 +31,13 @@ namespace Simulator
         struct L1Config l1;
         struct L2Config l2;
         std::string traceFilename;
+    };
+
+    struct CacheMetrics
+    {
+        float accessTime = 0.0;
+        float energy = 0.0;
+        float area = 0.0;
     };
 
     class Simulator
@@ -63,6 +71,8 @@ namespace Simulator
 
         void PrintConfig(void);
         void Start(void);
+
+        std::unique_ptr<CacheMetrics> GetMetrics(int sz, int blksize, int assoc);
 
         // Function to print the Trace struct
         void printTrace(const Trace& trace) const;

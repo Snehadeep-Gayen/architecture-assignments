@@ -1,8 +1,19 @@
 #include "Simulator.h"
 #include <cstring>
+#include "Parse.h"
 
 namespace Simulator
 {
+    std::unique_ptr<CacheMetrics> Simulator::GetMetrics(int sz, int blksize, int assoc)
+    {
+        CacheMetrics cm;
+        if(get_cacti_results(sz, blksize, assoc, &cm.accessTime, &cm.energy, &cm.area)<0)
+        {
+            cm.accessTime = cm.area = cm.energy = -1;
+        }
+        return std::make_unique<CacheMetrics>(cm);
+    }
+
     Simulator::Simulator(struct Config conf) : conf(conf), traces(),
         l1(conf.l1.sz, conf.l1.blksz, conf.l1.assoc, conf.l1.vc_num_blk != 0, conf.l1.vc_num_blk)
     {
@@ -74,8 +85,6 @@ namespace Simulator
                 continue;
             }
 
-            // ASK which happens first
-
             if(!L1status.hit)
             {
                 if(L1status.dirtyEvicted)
@@ -85,7 +94,7 @@ namespace Simulator
                     if(L2Wstatus.dirtyEvicted)
                         writeback_from_L2++;
                 }
-                
+
                 // means data has to be read from L2
                 Cache::Cache::OperationStatus L2Rstatus = l2->Read(trace.mem);
                 if(L2Rstatus.dirtyEvicted)
@@ -155,6 +164,56 @@ namespace Simulator
         {
             std::cout << "p. total memory traffic:\t\t\t" << (l1stats.readMiss + l1stats.writeMiss - l1stats.swaps + writeback_from_L1_plus_VC) << std::endl;
         }
+
+        std::cout << "\n===== Simulation results (performance) =====\n";
+        CacheMetrics l1_metrics, l2_metrics, vc_metrics;
+        l1_metrics = *GetMetrics(conf.l1.sz, conf.l1.blksz, conf.l1.assoc);
+        assert(l1_metrics.accessTime>0);
+        if(l2.has_value())
+        {
+            l2_metrics = *GetMetrics(conf.l2.sz, conf.l1.blksz, conf.l2.assoc);
+            assert(l2_metrics.accessTime>0);
+        }
+        if(conf.l1.vc_num_blk>0)
+        {
+            vc_metrics = *GetMetrics(conf.l1.vc_num_blk * conf.l1.blksz, conf.l1.blksz, conf.l1.vc_num_blk);
+            if(vc_metrics.accessTime<0)
+                vc_metrics.accessTime = 0.2;    // default is 0.2ns
+        }
+
+        // calculate the performance metrics
+
+        float l1_time = l1_metrics.accessTime * (l1stats.reads + l1stats.writes);
+        float vc_time = vc_metrics.accessTime * (l1stats.swapReqs);
+        float l2_time = l2_metrics.accessTime * (l2stats.reads + l2stats.writes);
+        float mm_time = (20.0 + conf.l1.blksz / 16.0) * (writeback_from_L1_plus_VC + writeback_from_L2);
+        float total_time = (l1_time + vc_time + l2_time + mm_time);
+        float aat =  total_time / (l1stats.reads + l1stats.writes);
+
+        std::cout << "1. average access time:\t\t\t" << std::fixed << std::setprecision(4) << aat << "\n";
+
+        float l1_energy = l1_metrics.energy * (l1stats.reads + l1stats.writes + l1stats.readMiss + l2stats.writeMiss);
+        float vc_energy = 0;
+        if(vc.has_value())
+        {
+            vc_energy = vc_metrics.energy * (l1stats.swapReqs) * 2;
+        }
+        float l2_energy = 0;
+        float mem_energy = 0;
+        if(l2.has_value())
+        {
+            l2_energy = l2_metrics.energy * (l2stats.reads + l2stats.writes + l2stats.readMiss + l2stats.writeMiss);
+            mem_energy = 0.05 * (writeback_from_L2 + l2stats.readMiss + l2stats.writeMiss);
+        }
+        else
+        {
+            mem_energy = 0.05 * (writeback_from_L1_plus_VC + l1stats.readMiss + l1stats.writeMiss - l1stats.swaps);
+        }
+        float total_energy = l1_energy + vc_energy + l2_energy + mem_energy;
+        std::cout << "2. energy-delay product:\t\t\t" << total_energy * total_time << "\n";
+
+        float total_area = l1_metrics.area + l2_metrics.area + vc_metrics.area;
+        std::cout << "3. total area:\t\t" << total_area << "\n";
     }
 
     // Function to print the Trace struct
