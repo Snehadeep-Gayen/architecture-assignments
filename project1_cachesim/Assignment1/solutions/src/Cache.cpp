@@ -30,7 +30,7 @@ namespace Cache{
     }
 
     Cache::Cache(int cacheSize, int blkSize, int assoc, bool vcEnable, int vcBlks) 
-        : cache(cacheSize, blkSize, assoc), cacheSize(cacheSize), blkSize(blkSize), assoc(assoc), vcEnable(vcEnable), vcBlks(vcBlks)
+        : cache(cacheSize, blkSize, assoc), cacheSize(cacheSize), blkSize(blkSize), assoc(assoc), vcBlks(vcBlks), vcEnable(vcEnable)
         {
             std::memset(&stats, 0, sizeof(stats));
             if(vcEnable)

@@ -62,10 +62,10 @@ namespace Simulator
         };
 
         struct Config conf;
+        std::vector<Trace> traces;
         Cache::Cache l1;
         std::optional<Cache::FullyAssociativeCache> vc;
         std::optional<Cache::Cache> l2;
-        std::vector<Trace> traces;
 
         Simulator(struct Config conf);
 

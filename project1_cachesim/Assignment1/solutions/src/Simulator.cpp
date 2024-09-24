@@ -1,6 +1,7 @@
 #include "Simulator.h"
 #include <cstring>
 #include "Parse.h"
+#include <iomanip>
 
 namespace Simulator
 {
