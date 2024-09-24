@@ -63,13 +63,9 @@ namespace Simulator
             // std::cout << "\n";
 
             if(trace.read)
-            {
                 L1status = l1.Read(trace.mem);
-            }
             else
-            {
                 L1status = l1.Write(trace.mem);
-            }
 
             if(!l2.has_value())
             {
@@ -82,18 +78,19 @@ namespace Simulator
 
             if(!L1status.hit)
             {
+                if(L1status.dirtyEvicted)
+                {
+                    writeback_from_L1_plus_VC++;
+                    Cache::Cache::OperationStatus L2Wstatus = l2->Write(L1status.address);
+                    if(L2Wstatus.dirtyEvicted)
+                        writeback_from_L2++;
+                }
+                
                 // means data has to be read from L2
                 Cache::Cache::OperationStatus L2Rstatus = l2->Read(trace.mem);
                 if(L2Rstatus.dirtyEvicted)
                     writeback_from_L2++;
-            }
 
-            if(L1status.dirtyEvicted)
-            {
-                writeback_from_L1_plus_VC++;
-                Cache::Cache::OperationStatus L2Wstatus = l2->Write(L1status.address);
-                if(L2Wstatus.dirtyEvicted)
-                    writeback_from_L2++;
             }
         }
 
@@ -105,7 +102,7 @@ namespace Simulator
         {
             std::cout << "===== VC contents =====\n";
             l1.PrintVC();
-            std::cout << "\n";
+            std::cout << "\n\n";
         }
 
         if(l2.has_value())
@@ -117,7 +114,7 @@ namespace Simulator
 
         Cache::Cache::Stats l1stats = l1.GetStats();
 
-        std::cout << "\n===== Simulation results (raw) =====\n";
+        std::cout << "===== Simulation results (raw) =====\n";
         
         std::cout << "a. number of L1 reads:\t\t\t" << l1stats.reads << std::endl;
         std::cout << "b. number of L1 read misses:\t\t\t" << l1stats.readMiss << std::endl;
@@ -147,9 +144,9 @@ namespace Simulator
         }
         else
         {
-            std::cout << "n. L2 miss rate:\t\t\t" << std::fixed << std::setprecision(4) << 0 << std::endl;
+            std::cout << "n. L2 miss rate:\t\t\t" << std::fixed << std::setprecision(4) << 0.0f << std::endl;
         }
-        std::cout << "o. number of writebacks from L2 to memory:\t" << writeback_from_L2 << std::endl;
+        std::cout << "o. number of writebacks from L2:\t" << writeback_from_L2 << std::endl;
         if(l2.has_value())
         {
             std::cout << "p. total memory traffic:\t\t\t" << (l2stats.readMiss + l2stats.writeMiss + writeback_from_L2) << std::endl;
