@@ -1,31 +1,29 @@
-import numpy as np
-
+import pandas as pd
 import matplotlib.pyplot as plt
 
-data = np.array([[0.97,0.87,0.73], [0.98,0.73,0.65]])
-labels = ['ARPANET', 'NFSNET']
-x = np.arange(len(labels))
-width = 0.35
+# Function to read the CSV file and plot lines
+def plot_csv_data(file_name):
+    # Read the CSV file into a pandas DataFrame
+    data = pd.read_csv(file_name)
+    
+    # Plot each column in the DataFrame (excluding the 'size' column)
+    plt.figure(figsize=(10, 6))
+    
+    for column in data.columns[1:]:
+        plt.plot(data['size']/1024, data[column], marker='o', label=column)
+    
+    # Adding labels and title
+    plt.xlabel('Cache Size (Kb)', fontsize=12)
+    plt.ylabel('Miss rate (%)', fontsize=12)
+    plt.title('Effect of Cache Size and Associativity', fontsize=14)
+    plt.grid(True)
+    plt.legend(title='Associativity', fontsize=10)
+    
+    # Save the plot to a file
+    plt.savefig('fig1.png', dpi=300, bbox_inches='tight')
+    
+    # Show the plot
+    plt.show()
 
-fig, ax = plt.subplots()
-# draw gridlines in the background
-ax.set_axisbelow(True)
-ax.yaxis.grid(color='gray', linestyle='dashed')
-
-# draw bars with the number on top
-ax.bar(x - width/2, 1-data[:, 0], width/2, label='100 connections', color='brown')
-ax.bar(x, 1-data[:, 1], width/2, label='200 connections', color='purple')
-ax.bar(x + width/2, 1-data[:, 2], width/2, label='300 connections', color='orange')
-
-# rects1 = ax.bar(x - width/2, data[:, 0], width/2, label='100')
-# rects2 = ax.bar(x, data[:, 1], width/2, label='200')
-# rects3 = ax.bar(x + width/2, data[:, 2], width/2, label='300')
-
-ax.set_ylabel('Blocking Probability of a Connection')
-ax.set_xticks(x)
-ax.set_xticklabels(labels)
-ax.legend()
-
-fig.tight_layout()
-
-plt.savefig('/home/snehadeep/Documents/router/router-assignments/assignment-1/report/figures/fig1/fig1.png')
+# Call the function with the CSV file name
+plot_csv_data('data.csv')
