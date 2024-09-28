@@ -175,32 +175,50 @@ namespace Simulator
             l2_metrics = *GetMetrics(conf.l2.sz, conf.l1.blksz, conf.l2.assoc);
             assert(l2_metrics.accessTime>0);
         }
+        else
+        {
+            l2_metrics.accessTime = l2_metrics.area = l2_metrics.energy = 0.0;
+        }
+
         if(conf.l1.vc_num_blk>0)
         {
             vc_metrics = *GetMetrics(conf.l1.vc_num_blk * conf.l1.blksz, conf.l1.blksz, conf.l1.vc_num_blk);
             if(vc_metrics.accessTime<0)
                 vc_metrics.accessTime = 0.2;    // default is 0.2ns
         }
+        else
+        {
+            vc_metrics.accessTime = vc_metrics.area = vc_metrics.energy = 0.0;
+        }
 
         // calculate the performance metrics
 
-        float l1_time = l1_metrics.accessTime * (l1stats.reads + l1stats.writes);
-        float vc_time = vc_metrics.accessTime * (l1stats.swapReqs);
-        float l2_time = l2_metrics.accessTime * (l2stats.reads + l2stats.writes);
-        float mm_time = (20.0 + conf.l1.blksz / 16.0) * (writeback_from_L1_plus_VC + writeback_from_L2);
-        float total_time = (l1_time + vc_time + l2_time + mm_time);
-        float aat =  total_time / (l1stats.reads + l1stats.writes);
+        double l1_time = l1_metrics.accessTime * (l1stats.reads + l1stats.writes);
+        double vc_time = vc_metrics.accessTime * (l1stats.swapReqs);
+        double l2_time = l2_metrics.accessTime * (l1stats.readMiss + l1stats.writeMiss - l1stats.swaps);
+        int num_memory_ops = 0;
+        if(l2.has_value())
+        {
+            num_memory_ops = l2stats.readMiss;
+        }
+        else
+        {
+            num_memory_ops = l1stats.readMiss + l1stats.writeMiss - l1stats.swaps;
+        }
+        double mm_time = (20.0 + conf.l1.blksz / 16.0) * (num_memory_ops);
+        double total_time = (l1_time + vc_time + l2_time + mm_time);
+        double aat =  total_time / (l1stats.reads + l1stats.writes);
 
         std::cout << "1. average access time:\t\t\t" << std::fixed << std::setprecision(4) << aat << "\n";
 
-        float l1_energy = l1_metrics.energy * (l1stats.reads + l1stats.writes + l1stats.readMiss + l2stats.writeMiss);
-        float vc_energy = 0;
-        if(vc.has_value())
+        double l1_energy = l1_metrics.energy * (l1stats.reads + l1stats.writes + l1stats.readMiss + l1stats.writeMiss);
+        double vc_energy = 0;
+        if(conf.l1.vc_num_blk>0)
         {
             vc_energy = vc_metrics.energy * (l1stats.swapReqs) * 2;
         }
-        float l2_energy = 0;
-        float mem_energy = 0;
+        double l2_energy = 0;
+        double mem_energy = 0;
         if(l2.has_value())
         {
             l2_energy = l2_metrics.energy * (l2stats.reads + l2stats.writes + l2stats.readMiss + l2stats.writeMiss);
@@ -210,10 +228,10 @@ namespace Simulator
         {
             mem_energy = 0.05 * (writeback_from_L1_plus_VC + l1stats.readMiss + l1stats.writeMiss - l1stats.swaps);
         }
-        float total_energy = l1_energy + vc_energy + l2_energy + mem_energy;
+        double total_energy = l1_energy + vc_energy + l2_energy + mem_energy;
         std::cout << "2. energy-delay product:\t\t\t" << total_energy * total_time << "\n";
 
-        float total_area = l1_metrics.area + l2_metrics.area + vc_metrics.area;
+        double total_area = l1_metrics.area + l2_metrics.area + vc_metrics.area;
         std::cout << "3. total area:\t\t" << total_area << "\n";
     }
 
