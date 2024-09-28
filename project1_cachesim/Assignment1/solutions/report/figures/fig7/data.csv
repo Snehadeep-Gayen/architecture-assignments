@@ -1,0 +1,7 @@
+l1_size,Direct-mapped L1 cache with no Victim Cache,Direct-mapped L1 cache with 4-entry Victim Cache,Direct-mapped L1 cache with 8-entry Victim Cache,Direct-mapped L1 cache with 16-entry Victim Cache,2-way set-associative L1 cache with no Victim Cache,4-way set-associative L1 cache with no Victim Cache
+1024,4.3865,3.3954,3.0669,2.6331,"",""
+2048,3.3955,2.6573,2.4351,2.1536,2.5391,""
+4096,2.3674,2.0088,1.8653,1.6068,1.8457,1.5252
+8192,1.6576,1.4352,1.333,1.1799,1.254,1.1509
+16384,1.2246,1.0984,1.0474,1.0023,0.9782,0.8663
+32768,1.0744,0.9733,0.9525,0.9221,0.909,0.8624

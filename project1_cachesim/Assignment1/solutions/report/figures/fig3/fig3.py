@@ -16,7 +16,7 @@ def plot_csv_data(file_name):
     # Adding labels and title
     plt.xlabel('Cache Size (Kb)', fontsize=12)
     plt.ylabel('Average Access Time (ns)', fontsize=12)
-    plt.title('Effect of Associativity on Average Access Time without L2 Cache', fontsize=14)
+    plt.title('Effect of Associativity on Average Access Time with L2 Cache', fontsize=14)
     plt.grid(True)
     plt.legend(title='Associativity', fontsize=10)
 
@@ -29,7 +29,7 @@ def plot_csv_data(file_name):
     
     
     # Save the plot to a file
-    plt.savefig('fig2.png', dpi=300, bbox_inches='tight')
+    plt.savefig('fig3.png', dpi=300, bbox_inches='tight')
     
     # Show the plot
     plt.show()
