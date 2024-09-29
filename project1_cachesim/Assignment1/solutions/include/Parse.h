@@ -44,6 +44,7 @@ int get_cacti_results(unsigned int SIZE, unsigned int BLOCKSIZE, unsigned int AS
 	/////////////////////////////////////////////////////////
 
 	while (fgets(buffer, 128, pipe)) {
+	  printf("%s", buffer);
 	  if ((substring = strstr(buffer, "Access time"))) {
 	     assert(substring = strstr(buffer, ":"));
 	     sscanf(substring, ": %f", AccessTime);
@@ -64,6 +65,7 @@ int get_cacti_results(unsigned int SIZE, unsigned int BLOCKSIZE, unsigned int AS
 	     errflag--;
 	  }
 	}
+	printf("\n");
 
 	/////////////////////////////////////////////////////////
 	// 4. Close the pipe.
