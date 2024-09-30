@@ -18,7 +18,7 @@ def plot_csv_data(file_name):
     plt.ylabel('Average Access Time (ns)', fontsize=12)
     plt.title('Effect of Victim Cache on Average Access Time without L2 Cache', fontsize=14)
     plt.grid(True)
-    plt.legend(title='Associativity', fontsize=10)
+    plt.legend(title='L1+VC Configuration', fontsize=10)
 
 
     # Custom xticks

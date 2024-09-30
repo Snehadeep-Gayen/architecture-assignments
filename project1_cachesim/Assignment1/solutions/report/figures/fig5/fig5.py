@@ -19,7 +19,7 @@ ax = fig.add_subplot(111, projection='3d')
 ax.plot_trisurf(x, y, z, cmap='viridis', edgecolor='none')
 
 # Set the view angle (elevation and azimuth)
-ax.view_init(elev=20, azim=130)  # Adjust the values for different angles
+ax.view_init(elev=20, azim=200)  # Adjust the values for different angles
 
 # Set custom ticks for L1 and L2 cache sizes (actual cache sizes in KB and MB)
 l1_ticks = ([12, 13, 14, 15, 16])  # L1 cache sizes from 4KB to 64KB
@@ -35,12 +35,12 @@ ax.set_yticks(l2_ticks)
 ax.set_yticklabels(l2_labels)
 
 # Label the axes
-ax.set_xlabel('L1 Cache Size')
-ax.set_ylabel('L2 Cache Size')
+ax.set_xlabel('L1 Cache Size (KB)')
+ax.set_ylabel('L2 Cache Size (KB)')
 ax.set_zlabel('Average Access Time (ns)')
 
 # Show the plot
-plt.show()
+# plt.show()
 
 plt.title('Varitation of average access time with L1 & L2 cache sizes', fontsize=14)
 

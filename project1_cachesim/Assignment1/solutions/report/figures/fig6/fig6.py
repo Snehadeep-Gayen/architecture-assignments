@@ -35,12 +35,12 @@ ax.set_yticks(l2_ticks)
 ax.set_yticklabels(l2_labels)
 
 # Label the axes
-ax.set_xlabel('L1 Cache Size')
-ax.set_ylabel('L2 Cache Size')
-ax.set_zlabel('Energy-Delay Product (pico Js)')
+ax.set_xlabel('L1 Cache Size (KB)')
+ax.set_ylabel('L2 Cache Size (KB)')
+ax.set_zlabel('Energy-Delay Product (mJ)')
 
 # Show the plot
-plt.show()
+# plt.show()
 
 plt.title('Varitation of energy-delay product with L1 & L2 cache sizes', fontsize=14)
 
