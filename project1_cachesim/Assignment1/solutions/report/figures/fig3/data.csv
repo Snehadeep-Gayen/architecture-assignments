@@ -1,4 +1,4 @@
-size,direct,2-way,4-way,8-way,full
+size,direct-mapped,2-way,4-way,8-way,fully-associative
 2048,0.7802,0.7986,"","",0.7842
 4096,0.7771,0.7918,0.8021,"",0.7728
 8192,0.782,0.8021,0.8039,0.8285,0.779

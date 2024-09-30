@@ -43,7 +43,7 @@ do
         assoc="${l1_assoc[$idx]}"
         
         # Build the command
-        cmd="$cachesim_path $l1_size $assoc $block_size $victim_entries 0 0 $trace_file"
+        cmd="$cachesim_path $l1_size $assoc $block_size $victim_entries 262144 8 $trace_file"
 
         # echo $cmd
         

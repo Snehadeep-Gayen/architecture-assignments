@@ -12,11 +12,15 @@ y = np.log2(data['l2 cache size'])  # log2(L2 cache size)
 z = data['aat']/1e6  # AAT
 
 # Create a 3D plot
-fig = plt.figure(figsize=(10, 7))  # Adjust the figure size for a better fit
+fig = plt.figure(figsize=(10, 8))  # Adjust the figure size for a better fit
 ax = fig.add_subplot(111, projection='3d')
 
 # Plot the surface
-ax.plot_trisurf(x, y, z, cmap='viridis', edgecolor='none')
+surf = ax.plot_trisurf(x, y, z, cmap='viridis', edgecolor='none')
+
+# Add a colorbar to show the scale of the z-values (AAT)
+cbar = fig.colorbar(surf, ax=ax, shrink=0.5, aspect=10)
+cbar.set_label('Energy-Delay Product (pico J.s)')
 
 # Set the view angle (elevation and azimuth)
 ax.view_init(elev=10, azim=210)  # Adjust the values for different angles
@@ -37,12 +41,13 @@ ax.set_yticklabels(l2_labels)
 # Label the axes
 ax.set_xlabel('L1 Cache Size (KB)')
 ax.set_ylabel('L2 Cache Size (KB)')
-ax.set_zlabel('Energy-Delay Product (mJ)')
+ax.set_zlabel('Energy-Delay Product (pico J.s)')
 
-# Show the plot
-# plt.show()
-
-plt.title('Varitation of energy-delay product with L1 & L2 cache sizes', fontsize=14)
+# Set the title
+plt.title('Variation of Energy-Delay Product with L1 & L2 Cache Sizes', fontsize=14)
 
 # Save the figure
-plt.savefig('./fig6.png')
+plt.savefig('./fig6.png', dpi=300)
+
+# Show the plot (if needed)
+# plt.show()

@@ -14,7 +14,7 @@ def plot_csv_data(file_name):
         plt.plot(np.log2(data['l1_size']/1024), (data[column]), marker='o', label=column)
     
     # Adding labels and title
-    plt.xlabel('Cache Size (Kb)', fontsize=12)
+    plt.xlabel('Cache Size (KB)', fontsize=12)
     plt.ylabel('Average Access Time (ns)', fontsize=12)
     plt.title('Effect of Victim Cache on Average Access Time without L2 Cache', fontsize=14)
     plt.grid(True)

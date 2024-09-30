@@ -35,4 +35,4 @@ def plot_csv_data(file_name):
     plt.show()
 
 # Call the function with the CSV file name
-plot_csv_data('data.csv')
+plot_csv_data('data.csv', dpi=300)

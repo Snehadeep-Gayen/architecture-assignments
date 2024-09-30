@@ -12,11 +12,11 @@ y = np.log2(data['l2 cache size'])  # log2(L2 cache size)
 z = data['aat']  # AAT
 
 # Create a 3D plot
-fig = plt.figure(figsize=(10, 7))  # Adjust the figure size for a better fit
+fig = plt.figure(figsize=(10, 8))  # Adjust the figure size for a better fit
 ax = fig.add_subplot(111, projection='3d')
 
 # Plot the surface
-ax.plot_trisurf(x, y, z, cmap='viridis', edgecolor='none')
+surf = ax.plot_trisurf(x, y, z, cmap='viridis', edgecolor='none')
 
 # Set the view angle (elevation and azimuth)
 ax.view_init(elev=20, azim=200)  # Adjust the values for different angles
@@ -45,4 +45,4 @@ ax.set_zlabel('Average Access Time (ns)')
 plt.title('Varitation of average access time with L1 & L2 cache sizes', fontsize=14)
 
 # Save the figure
-plt.savefig('./fig5.png')
+plt.savefig('./fig5.png', dpi=300)
