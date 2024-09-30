@@ -11,25 +11,25 @@ def plot_csv_data(file_name):
     plt.figure(figsize=(10, 6))
     
     for column in data.columns[1:]:
-        plt.plot(np.log2(data['size']/1024), (data[column])*100, marker='o', label=column)
+        plt.plot(data['size'], (data[column])*100, marker='o', label=column)
     
     # Adding labels and title
-    plt.xlabel('Cache Size (KB)', fontsize=12)
+    plt.xlabel('Block Size (B)', fontsize=12)
     plt.ylabel('Miss rate (%)', fontsize=12)
-    plt.title('Effect of Cache Size and Associativity on Miss Rate', fontsize=14)
+    plt.title('Effect of block size on miss rate for different cache sizes', fontsize=14)
     plt.grid(True)
-    plt.legend(title='Associativity', fontsize=10)
+    plt.legend(title='Cache Size', fontsize=10)
 
 
     # Custom xticks
-    xtick_labels = data['size'] / 1024  # Cache size in KB
-    xtick_positions = np.log2(xtick_labels)  # Corresponding positions in log2 scale
+    # xtick_labels = data['size']  # Cache size in KB
+    # xtick_positions = np.log2(xtick_labels)  # Corresponding positions in log2 scale
 
-    plt.xticks(ticks=xtick_positions, labels=xtick_labels.astype(int), fontsize=10)
+    # plt.xticks(ticks=xtick_positions, labels=xtick_labels.astype(int), fontsize=10)
     
     
     # Save the plot to a file
-    plt.savefig('fig1.png', dpi=300, bbox_inches='tight')
+    plt.savefig('fig4.png', dpi=300, bbox_inches='tight')
     
     # Show the plot
     # plt.show()
