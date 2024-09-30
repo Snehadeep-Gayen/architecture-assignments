@@ -1,5 +1,5 @@
 CC = g++
-CFLAGS = -O3 --std=c++20 -Wall -Iinclude/
+CFLAGS = -g --std=c++20 -Wall -Iinclude/
 SIM_SRC = src/Main.cpp src/GenCache.cpp src/FullAssocCache.cpp src/Simulator.cpp src/Cache.cpp
 BUILD_DIR = build
 SIM_OBJ = $(patsubst src/%.cpp,$(BUILD_DIR)/%.o,$(SIM_SRC))
