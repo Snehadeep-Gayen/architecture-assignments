@@ -30,11 +30,14 @@ namespace Simulator
         for(auto trace : traces)
             bp.predict_and_check(trace.mem, trace.taken);
         auto stats = bp.GetStats();
-        std::cout << "OUTPUTS\n";
+        std::cout << "OUTPUT\n";
         std::cout << " number of predictions: " << stats.branches << "\n";
         std::cout << " number of mispredictions: " << stats.mispreds << "\n";
-        std::cout << " mispredictions rate: " << std::setprecision(2) << (static_cast<float>(stats.mispreds) / stats.branches) << "\n";
-        std::cout << "FINAL BIMODAL CONTENTS\n";
+        std::cout << " misprediction rate: " << std::fixed << std::setprecision(2) << (static_cast<float>(stats.mispreds)*100 / stats.branches) << "%\n";
+        if(conf.bimodal)
+            std::cout << "FINAL BIMODAL CONTENTS\n";
+        else
+            std::cout << "FINAL GSHARE CONTENTS\n";
         bp.print_counters();
     }
 
