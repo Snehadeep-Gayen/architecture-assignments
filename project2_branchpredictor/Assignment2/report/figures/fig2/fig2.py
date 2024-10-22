@@ -26,7 +26,7 @@ def plot_data(data, benchmark_name, output_file):
         plt.plot(m_values, mispredictions, marker='o', label=f"n={n}")
     
     plt.title(f'Misprediction Rate vs m for {benchmark_name}', fontsize=20)
-    plt.xlabel('m (Global History Register Size)', fontsize=18)
+    plt.xlabel('m (Number of PC bits)', fontsize=18)
     plt.ylabel('Misprediction Rate (%)', fontsize=18)
     plt.xticks(fontsize=18)
     plt.yticks(fontsize=18)

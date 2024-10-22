@@ -46,11 +46,17 @@ This project simulates and analyses bimodal and gshare branch predictors on vari
 
 
         \begin{center}
-            (b)
+            (b) 
         \end{center}
+        Given $m$ number of bits used for indexing into the predictor table, number of storage bits required for the predictor table is $2^{m+2}$. This is because each entry has to be a 2-bit counter. Thus, with 16KB budget, one can have $m$ as atmost $16$. But from the graphs we see that the improvement from $m=11$ to $m=12$ is not appreciable. However in the case of \texttt{jpeg} trace the increase in accuracy from 10 to 11 is sizeable. Further, with $m=11$ only 1KB of memory is used. Thus, $\mathbf{m=11}$ is a reasonable choice balancing misprediction rate, storage and power.
     \end{subsection}
 
     \begin{subsection}{Gshare Predictor}
+        
+        \begin{center}
+            (a)
+        \end{center}
+
         The figure below shows the misprediction rates of the Gshare branch predictor for different values of $m$ (lookup bits from the program counter address) and $n$ (global branch history register).
 
 
@@ -70,6 +76,18 @@ This project simulates and analyses bimodal and gshare branch predictors on vari
             \caption{Miss prediction rate for varying number of prediction bits $m$ and global branch register size $n$}
             \label{fig:twopictures}
         \end{figure}
+
+        Some general observations, similarities and differences from the above plots are described below:
+        \begin{itemize}
+            \item For a given size $n$ of the global branch history register, we see that the misprediction rate decreases if we increase the number of prediction bits $m$ considered from the address. As explained in the previous plot, this is because of the reduced number of address collisions in the branch prediction buffer.
+            \item For a given $m$, it is expected that increasing the global history register size $m$, decreases the misprediction rate by better utilising the global branch history. While this trend is clearly false in the case of \texttt{gcc} trace, it somewhat holds for \texttt{jpeg} trace. This is probably because, the initial setup of the global branch history takes time for larger values of $n$. Thus, there may be a lot of initial mispredictions. This effect would probably decrease with a larger trace.
+        \end{itemize}
+
+
+        \begin{center}
+            (b)
+        \end{center}
+        One important observation here is that, for Gshare predictor, increasing $n$ does not increase the storage required for the predictor table. Further, it has negligible increase on the power also. Thus, a larger value of $n$ is preferred. From the figure we observe that $m=11$ gives a reasonable misprediction rate. Any lesser value of $m$ would increase the mispredictions by atleast 35\% and an increase in $m$ for \texttt{jpeg} is observed to, unintuitively, increase the mispredictions. For this $m$, considering both the plots we observe that $n=4$ is a good choice as it has second best misprediction rate for both the traces. Thus, $\mathbf{m=11}$ and $\mathbf{n=4}$, is the preferred choice. This choice has reasonable storage requirement of $1KB$ and achieves a misprediction rate of about 14\% and 7.25\% for the \texttt{gcc} and \texttt{jpeg} traces respectively.
 
     \end{subsection}
 
