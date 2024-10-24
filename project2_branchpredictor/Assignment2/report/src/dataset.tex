@@ -44,7 +44,6 @@ This project simulates and analyses bimodal and gshare branch predictors on vari
             \item Secondly, the fractional decrease in the misprediction rate, by increasing $m$, is much higher in \texttt{gcc} (around ~15\%) than in \texttt{jpeg} (~5-6\%). This proves that despite having more unpredictable branches than \texttt{jpeg}, the improvement in misprediction rate with increasing $m$ is much more for \texttt{gcc}. 
         \end{itemize}
 
-
         \begin{center}
             (b) 
         \end{center}
@@ -58,7 +57,6 @@ This project simulates and analyses bimodal and gshare branch predictors on vari
         \end{center}
 
         The figure below shows the misprediction rates of the Gshare branch predictor for different values of $m$ (lookup bits from the program counter address) and $n$ (global branch history register).
-
 
         \begin{figure}[h] % Positioning option: h (here)
             \centering
@@ -82,7 +80,6 @@ This project simulates and analyses bimodal and gshare branch predictors on vari
             \item For a given size $n$ of the global branch history register, we see that the misprediction rate decreases if we increase the number of prediction bits $m$ considered from the address. As explained in the previous plot, this is because of the reduced number of address collisions in the branch prediction buffer.
             \item For a given $m$, it is expected that increasing the global history register size $m$, decreases the misprediction rate by better utilising the global branch history. While this trend is clearly false in the case of \texttt{gcc} trace, it somewhat holds for \texttt{jpeg} trace. This is probably because, the initial setup of the global branch history takes time for larger values of $n$. Thus, there may be a lot of initial mispredictions. This effect would probably decrease with a larger trace.
         \end{itemize}
-
 
         \begin{center}
             (b)

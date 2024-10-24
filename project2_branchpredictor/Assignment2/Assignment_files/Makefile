@@ -1,44 +1,19 @@
 CC = g++
-OPT = -O3
-WARN = -Wall
-CFLAGS = $(OPT) $(WARN) $(INC) $(LIB)
+CFLAGS = -Wall -Wextra -Wpedantic
 
-# List all your .cc files here (source files, excluding header files)
-SIM_SRC = branch_predictor.cpp
+# Use the correct extension of your source file here
+SIM_SRC = branchpredictor.cpp main.cpp simulator.cpp
+SIM_OBJ = $(SIM_SRC:.cpp=.o)
 
-# List corresponding compiled object files here (.o files)
-SIM_OBJ = branch_predictor.o
- 
-#################################
+EXEC = bpsim
 
-# default rule
+all: $(EXEC)
 
-all: bpsim
-	@echo "Done with make..."
+$(EXEC): $(SIM_OBJ)
+	$(CC) -o $(EXEC) $(CFLAGS) $(SIM_OBJ)
 
-
-# rule for making bpsim
-
-bpsim: $(SIM_OBJ)
-	$(CC) -o bpsim $(CFLAGS) $(SIM_OBJ) -lm
-	@echo "-----------DONE WITH BPSIM-----------"
-
-
-# generic rule for converting any .cc file to any .o file
- 
-.cc.o:
-	$(CC) $(CFLAGS)  -c $*.cc
-
-
-# type "make clean" to remove all .o files plus the bpsim binary
+%.o: %.cpp
+	$(CC) $(CFLAGS) -c $< -o $@
 
 clean:
-	rm -f *.o bpsim
-
-
-# type "make clobber" to remove all .o files (leaves bpsim binary)
-
-clobber:
-	rm -f *.o
-
-
+	rm -f *.o $(EXEC)
